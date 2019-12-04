@@ -1,9 +1,9 @@
 
 
 const Hapi = require('@hapi/hapi');
-// const Git = require('./util-git');
+const Git = require('./util-git');
 
-// let git = new Git();
+let git = new Git();
 
 class ServerClass {
   constructor(routes) {
@@ -29,7 +29,7 @@ const setRoutes = (server) => {
     path: '/',
     handler: async function (request, h) {
       try {
-        // await git.log();
+        await git.log();
       } catch (error) {
 
       }
@@ -47,7 +47,7 @@ const setEvents = (server) => {
 
     // Logica para clonar el repositorio de Git o actualizarlo.
     try {
-      // await git.clone('https://github.com/nodegit/nodegit', 'nodegit');
+      await git.clone('https://github.com/nodegit/nodegit', 'nodegit');
     } catch (error) {
       console.error(error.message);
     }
