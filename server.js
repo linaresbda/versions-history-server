@@ -32,11 +32,24 @@ const setRoutes = (server) => {
     path: '/',
     handler: async function (request, h) {
       try {
-        await git.log(repoName);
-      } catch (error) {
+        // Pull al Repo
+        await git.pull(repoName);
 
+        // Lista de tags
+        let tags = await git.tags(repoName);
+
+        // Lista de tags con detalles
+        let tagsDecorate = [];
+        for (let element of tags) {
+          let details = await git.tagDetails(repoName, element);
+          tagsDecorate.push(details);
+        }
+
+        // Regresamos la lista
+        return tagsDecorate;
+      } catch (error) {
+        return error.message;
       }
-      return 'Hello World!';
     }
   });
 }

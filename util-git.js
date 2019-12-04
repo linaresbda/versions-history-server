@@ -16,6 +16,53 @@ class GitClass {
     });
   }
 
+  async pull(repoName) {
+    await Git.Repository.open(repoName)
+      .then(function (repo) {
+        return repo.fetchAll();
+      })
+      // Now that we're finished fetching, go ahead and merge our local branch
+      // with the new one
+      .then(repository => function () {
+        return repository.mergeBranches("master", "origin/master");
+      })
+      .done(function () {
+        console.log("Done!");
+      });
+  }
+
+  async tags(repoName) {
+    return await Git.Repository.open(repoName)
+      .then(function (repo) {
+        return Git.Tag.list(repo);
+      });
+  }
+
+  async tagDetails(repoName, tagName) {
+    return await Git.Repository.open(repoName)
+      .then(async function (repo) {
+        return await Git.Reference
+          .lookup(repo, `refs/tags/${tagName}`)
+          // This resolves the tag (annotated or not) to a commit ref
+          .then(ref =>
+            ref.peel(Git.Object.TYPE.COMMIT)
+          )
+          .then(ref =>
+            Git.Commit.lookup(repo, ref.id())
+          ) // ref.id() now
+          .then(commit =>
+            (
+              {
+                tag: tagName,
+                hash: commit.sha(),
+                date: commit.date().toJSON(),
+                message: commit.message()
+              }
+            )
+          );
+      });
+  }
+
   async log(repoName) {
     await Git.Repository.open(repoName)
       // Open the master branch.
@@ -27,33 +74,10 @@ class GitClass {
         // Create a new history event emitter.
         var history = firstCommitOnMaster.history();
 
-        // Create a counter to only show up to 9 entries.
-        var count = 0;
-
-        let listCommit = [];
         // Listen for commit events from the history.
         history.on("commit", function (commit) {
-          // Disregard commits past 9.
-          if (++count >= 9) {
-            return;
-          }
-
-          let comm = {};
-
-          // Show the commit sha.
-          console.log("commit " + commit.sha());
-
-          // Store the author object.
-          var author = commit.author();
-
-          // Display author information.
-          console.log("Author:\t" + author.name() + " <" + author.email() + ">");
-
-          // Show the commit date.
-          console.log("Date:\t" + commit.date());
-
-          // Give some space and show the message.
-          console.log("\n    " + commit.message());
+          console.log(`${commit.sha()} ${commit.message()} ${commit.tag()}`)
+          NodeGit.Tag.list(repo)
         });
 
         // Start emitting events.
