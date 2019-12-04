@@ -16,8 +16,8 @@ class GitClass {
     });
   }
 
-  async log() {
-    await Git.Repository.open("nodegit")
+  async log(repoName) {
+    await Git.Repository.open(repoName)
       // Open the master branch.
       .then(function (repo) {
         return repo.getMasterCommit();

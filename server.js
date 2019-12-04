@@ -5,6 +5,9 @@ const Git = require('./util-git');
 
 let git = new Git();
 
+const repoURL = 'https://github.com/linaresbda/versions-history-server.git';
+const repoName = 'versions-history-server';
+
 class ServerClass {
   constructor(routes) {
     this.routes = routes;
@@ -29,7 +32,7 @@ const setRoutes = (server) => {
     path: '/',
     handler: async function (request, h) {
       try {
-        await git.log();
+        await git.log(repoName);
       } catch (error) {
 
       }
@@ -47,7 +50,7 @@ const setEvents = (server) => {
 
     // Logica para clonar el repositorio de Git o actualizarlo.
     try {
-      await git.clone('https://github.com/nodegit/nodegit', 'nodegit');
+      await git.clone(repoURL, repoName);
     } catch (error) {
       console.error(error.message);
     }
