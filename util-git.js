@@ -32,35 +32,22 @@ class GitClass {
   }
 
   async tags(repoName) {
-    return await Git.Repository.open(repoName)
-      .then(function (repo) {
-        return Git.Tag.list(repo);
-      });
+    let repo = await Git.Repository.open(repoName);
+    return await Git.Tag.list(repo);
   }
 
   async tagDetails(repoName, tagName) {
-    return await Git.Repository.open(repoName)
-      .then(async function (repo) {
-        return await Git.Reference
-          .lookup(repo, `refs/tags/${tagName}`)
-          // This resolves the tag (annotated or not) to a commit ref
-          .then(ref =>
-            ref.peel(Git.Object.TYPE.COMMIT)
-          )
-          .then(ref =>
-            Git.Commit.lookup(repo, ref.id())
-          ) // ref.id() now
-          .then(commit =>
-            (
-              {
-                tag: tagName,
-                hash: commit.sha(),
-                date: commit.date().toJSON(),
-                message: commit.message()
-              }
-            )
-          );
-      });
+    let repo = await Git.Repository.open(repoName);
+    let ref = await Git.Reference.lookup(repo, `refs/tags/${tagName}`);
+    let tag = await ref.peel(Git.Object.TYPE.COMMIT);
+    let commit = await Git.Commit.lookup(repo, tag.id())
+    let result = {
+      tag: tagName,
+      hash: commit.sha(),
+      date: commit.date().toJSON(),
+      message: commit.message()
+    }
+    return result;
   }
 
   async log(repoName) {
@@ -76,8 +63,7 @@ class GitClass {
 
         // Listen for commit events from the history.
         history.on("commit", function (commit) {
-          console.log(`${commit.sha()} ${commit.message()} ${commit.tag()}`)
-          NodeGit.Tag.list(repo)
+          console.log(`${commit.sha()} ${commit.message()}`)
         });
 
         // Start emitting events.
