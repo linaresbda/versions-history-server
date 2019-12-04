@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/linaresbda/versions-history-server/issues"
   },
-  "homepage": "https://github.com/linaresbda/versions-history-server#readme"
+  "homepage": "https://github.com/linaresbda/versions-history-server#readme",
+  "dependencies": {
+    "@hapi/hapi": "^18.4.0",
+    "nodegit": "^0.26.2"
+  }
 }
